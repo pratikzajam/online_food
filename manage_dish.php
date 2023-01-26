@@ -13,6 +13,7 @@ $image_error = "";
 
 
 
+
 if (isset($_GET['id']) && $_GET['id'] > 0) {
   $id = get_safe_value($_GET['id']);
   $row = mysqli_fetch_assoc(mysqli_query($con, "select * from dish where id='$id'"));
@@ -30,7 +31,11 @@ if (isset($_GET['id']) && $_GET['id'] > 0) {
 
 
 if (isset($_POST['submit'])) {
-  prx($_POST);
+
+  
+
+
+  
   $category_id = get_safe_value($_POST['category_id']);
   $dish = get_safe_value($_POST['dish']);
   $dish_details = get_safe_value($_POST['dish_details']);
@@ -55,8 +60,19 @@ if (isset($_POST['submit'])) {
         $image = rand(111111111, 999999999) . '_' . $_FILES['image']['name'];
         move_uploaded_file($_FILES['image']['tmp_name'], SERVER_DISH_IMAGE . $image);
         mysqli_query($con, "insert into dish (category_id,dish,dish_details,status,added_on,image)values('$category_id','$dish','$dish_details',1,'$added_on','$image')");
-        echo "inserted";
-        $attribute = $_POST['attribute'];
+        $did=mysqli_insert_id($con);
+        $attributeArr = $_POST['attribute'];
+        $priceArr = $_POST['price'];
+
+        foreach ($attributeArr as $key=>$val) {
+          $attribute =$val;
+          $price = $priceArr[$key];
+          mysqli_query($con,"insert into dish_details(dish_id,attribute,price,status,added_on) values('$did','$attribute','$price',1,'$added_on')");
+          echo "insert into dish_details(dish_id,attribute,price,status,added_on) values('$did','$attribute','$price',1,'$added_on')";
+         
+           
+        }
+
 
         redirect('dish.php');
 
@@ -148,10 +164,10 @@ $res_category = mysqli_query($con, "select * from category where status='1' orde
           </div>
 
           <div class="form-group" id="dish_box1">
-          <label for="exampleInputEmail3">dish Details</label>
+            <label for="exampleInputEmail3">dish Details</label>
             <div class="row">
               <div class="col-6">
-                <input type="text" class="form-control" name="Attribute[]" placeholder="attribute">
+                <input type="text" class="form-control" name="attribute[]" placeholder="attribute">
               </div>
               <div class="col-6">
                 <input type="text" class="form-control" placeholder="price" name="price[]" placeholder="price">
@@ -167,17 +183,17 @@ $res_category = mysqli_query($con, "select * from category where status='1' orde
       </div>
     </div>
   </div>
-<input type="textbox" id="add_more" value="1" hidden />
+  <input type="textbox" id="add_more" value="1" hidden />
 
   <script>
     function add_more() {
-      var add_more=jQuery('#add_more').val();
-      var html = '<div class="row mt8" id="box'+add_more+'"><div class="col-5"><input type="text" class="form-control" placeholder="Attribute" name="attribute[]" required></div><div class="col-5"><input type="text" class="form-control" placeholder="Price" name="price[]" required></div><div class="col-2"><button type="button" class="btn badge-danger mr-2" onclick=remove_more("'+add_more+'")>Remove</button></div></div>';
+      var add_more = jQuery('#add_more').val();
+      var html = '<div class="row mt8" id="box' + add_more + '"><div class="col-5"><input type="text" class="form-control" placeholder="Attribute" name="attribute[]" required></div><div class="col-5"><input type="text" class="form-control" placeholder="Price" name="price[]" required></div><div class="col-2"><button type="button" class="btn badge-danger mr-2" onclick=remove_more("' + add_more + '")>Remove</button></div></div>';
       jQuery('#dish_box1').append(html);
     }
 
-    function remove_more(id){
-      jQuery('#box'+id).remove();
+    function remove_more(id) {
+      jQuery('#box' + id).remove();
     }
 
   </script>
