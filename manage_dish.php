@@ -162,9 +162,9 @@ $res_category = mysqli_query($con, "select * from category where status='1' orde
           <div class="error mt8">
             <?php echo $image_error ?>
           </div>
-
           <div class="form-group" id="dish_box1">
             <label for="exampleInputEmail3">dish Details</label>
+          <?php if($id==0) {?>
             <div class="row">
               <div class="col-6">
                 <input type="text" class="form-control" name="attribute[]" placeholder="attribute">
@@ -173,8 +173,37 @@ $res_category = mysqli_query($con, "select * from category where status='1' orde
                 <input type="text" class="form-control" placeholder="price" name="price[]" placeholder="price">
               </div>
             </div>
-          </div>
+            <?php } else {
+            $dish_details_res = mysqli_query($con, "select * from dish_details where dish_id='$id'");
+            $ii = 1;
+            while ($dish_details_row = mysqli_fetch_assoc($dish_details_res)) {
 
+              ?>
+              <div class="row mt8">
+              <div class="col-5">
+                <input type="text" class="form-control" name="attribute[]" placeholder="attribute" value="<?php echo $dish_details_row['attribute'] ?>">
+              </div>
+              <div class="col-5">
+                <input type="text" class="form-control" placeholder="price" name="price[]" placeholder="price" value="<?php echo $dish_details_row['price'] ?>">
+              </div>
+            
+              <?php if ($ii != 1) {
+                ?>
+           <button type="button" class="btn badge-danger mr-2" onclick="remove_more()">Remove</button>
+               <?php
+              }
+              ?>
+               
+            
+            </div>
+               <?php
+               $ii++;
+            }}?>
+            </div>
+            
+            
+          
+         
           <button type="submit" name="submit" class="btn btn-primary mr-2">Submit</button>
           <button type="buttton" class="btn badge-danger mr-2" onclick="add_more()">Add More</button>
 
