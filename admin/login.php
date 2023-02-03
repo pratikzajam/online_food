@@ -1,7 +1,7 @@
 <?php
 session_start();
-include('database.inc.php');
-include('function.inc.php');
+include('../database.inc.php');
+include('../function.inc.php');
 if(isset($_POST['submit'])){
     $username=get_safe_value($_POST['username']);
     $password=get_safe_value($_POST['password']);
