@@ -27,11 +27,19 @@ if (isset($_GET['id']) && $_GET['id'] > 0) {
 
 }
 
+if(isset($_GET['dish_details_id']) && $_GET['dish_details_id']>0){
+
+  $dish_details_id = get_safe_value($_GET['dish_details_id']);
+  $id = get_safe_value($_GET['id']);
+  mysqli_query($con, "delete from dish_details where id='$dish_details_id'");
+  redirect('manage_dish.php?id='.$id);
+}
+
 
 
 
 if (isset($_POST['submit'])) {
-
+  
   
 
 
@@ -103,7 +111,28 @@ if (isset($_POST['submit'])) {
         $sql = "update dish set category_id='$category_id',dish='$dish',
   dish_details='$dish_details' $image_condition where id='$id'";
         mysqli_query($con, $sql);
-        redirect('dish.php');
+
+        foreach ($attributeArr as $key=>$val) {
+          $attribute =$val;
+          $price = $priceArr[$key];
+          $dishDetailsIdArr=$_POST['$key'];
+          
+          if(isset($dishDetailsIdArr[$key]))
+          {
+            $did = $dishDetailsIdArr[$key];
+            mysqli_query($con, "update dish_details set attribute='$attribute',price='$price' where id='$id'");
+          } else {
+
+            mysqli_query($con, "insert into dish_details(dish_id,attribute,price,status,added_on) values('$id','$attribute','$price',1,'$added_on')");
+           
+          }
+         
+           
+        }
+
+       
+
+       // redirect('dish.php');
       }
 
 
@@ -181,15 +210,19 @@ $res_category = mysqli_query($con, "select * from category where status='1' orde
               ?>
               <div class="row mt8">
               <div class="col-5">
+              <input type="hidden"  name="dish_details_id[]"placeholder="attribute" value="<?php echo $dish_details_row['id'] ?>">
                 <input type="text" class="form-control" name="attribute[]" placeholder="attribute" value="<?php echo $dish_details_row['attribute'] ?>">
               </div>
               <div class="col-5">
+                
                 <input type="text" class="form-control" placeholder="price" name="price[]" placeholder="price" value="<?php echo $dish_details_row['price'] ?>">
               </div>
             
               <?php if ($ii != 1) {
                 ?>
-           <button type="button" class="btn badge-danger mr-2" onclick="remove_more()">Remove</button>
+          <div class="col-2"> <button type="button" class="btn badge-danger mr-2" onclick="remove_more_new('<?php echo $dish_details_row['id']?>')">Remove</button></div>
+        
+
                <?php
               }
               ?>
@@ -223,6 +256,15 @@ $res_category = mysqli_query($con, "select * from category where status='1' orde
 
     function remove_more(id) {
       jQuery('#box' + id).remove();
+    }
+
+    function remove_more_new(id){
+      var result=confirm('Are You sure?');
+      if(result==true){
+        var cur_path=window.location.href;
+        window.location.href=cur_path+"&dish_details_id="+id;
+      }
+      
     }
 
   </script>
